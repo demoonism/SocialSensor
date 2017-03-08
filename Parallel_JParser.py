@@ -3,11 +3,15 @@ import gzip
 import time
 import simplejson as json
 import sys
+import os
+import glob
+import datetime
 
 def parseJson(jsonfile):
     tweets = []
+	#counter = 0
+
     with gzip.open(jsonfile,'r') as fin:
-        counter = 0
         for line in fin:
             #if "entities" not in line:
             #    continue
@@ -43,31 +47,45 @@ def parseJson(jsonfile):
                             }
                 tweets.append(processed)
                 #tweets.append(d)
-            if counter % 50000 == 0:
-                print "processed ", counter
-            counter+=1
+            #if counter % 100000 == 0:
+            #    print "processed ", counter
+            #counter+=1
     return tweets
 
 
 
 
 if __name__ == "__main__":
-
+	
+	#print(sys.argv)
+	start_time = time.time()
+	
 	## Linux
 	#jsonfilename = '/home/danielshi/tw_pyspark/Sample/statuses.log.2014-07-01-00.gz'
-	jsonfilename = sys.argv[1]    #'/mnt/f/Demoonism/Data Scientist/Spark/statuses.log.2014-07-01-00.gz'
+	folder = sys.argv[1]    #'/mnt/f/Demoonism/Data Scientist/Spark/statuses.log.2014-07-01-00.gz'
+	print("running folder ",folder, "..." )
 	## Windows
 	#jsonfilename = '../statuses.log.2014-07-01-00.gz'
+	path = os.path.join(folder,'*.gz')
+	output = []
+	files = glob.glob(path)
+	
+	counter = 0
+	for jsonfilename in files:
+		result = parseJson(jsonfilename)
+		output.append(result)
+		counter += 1
+		if counter % 2 == 0:
+			print "processed ", counter
 
-	start_time = time.time()
-	result = parseJson(jsonfilename)
-	print('Pre-processing A takes: {} seconds'.format(round(time.time() - start_time, 5)))
-
-	#with open('data.txt', 'w') as outfile:
-	#    json.dump(result, outfile)
-		
-	with gzip.open('../out.json.gz', 'wb') as f:
-		json.dump(result, f)
+	out_filename = sys.argv[2]
+	sec = time.time() - start_time
+	m, s = divmod(sec, 60)
+	h, m = divmod(m, 60)
+	print('Pre-processing '+ folder +' takes - %d:%02d:%02d which is %d seconds in total' % (h,m,s,sec))
+	
+	with gzip.open(out_filename+'.json.gz', 'wb') as f:
+		json.dump(output, f)
 
 
 
