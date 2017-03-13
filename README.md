@@ -7,3 +7,5 @@ To do:
 2. Spark aggregation
 3. Build sparse matrix
 4. LibLinear implementation
+
+notes: http://www.learnbymarketing.com/618/pyspark-rdd-basics-examples/
