@@ -46,20 +46,9 @@ def parseJson(jsonfile):
                                  #"location":['loc_' + s for s in d['user']['location'].split(" ")],
                                  "location":['loc_' + s for s in d['user']['location'].split(" ")],
                                  ## mention ids
-                                
                                  "mention":[mention['screen_name'] for mention in d['entities']['user_mentions']],
                                  ## language
                                  "lang":d['user']['lang'],
-                                 ## day of week
-                                 #"dow":dow,
-                                 ## month in 3 letters
-                                 #"month": month,
-                                 ## numeric day 1-31
-                                 #"day":day,
-                                 ## hr:min:sec
-                                 #"time":time,
-                                 ## numeric year
-                                 #"year":year
                                  "HashTag_Birthday":getUnixTimeStamp(d['created_at'])
                                 }
                     tweets.append(processed)
