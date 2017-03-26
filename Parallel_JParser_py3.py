@@ -108,7 +108,7 @@ if __name__ == "__main__":
                 output = output + result  ##simple list concatenation
                 counter += 1
                 if counter % 5 == 0:
-                    print "processed ", counter
+                    print("processed ", counter)
             
             
             s,m,h,sec = getTime(now)
