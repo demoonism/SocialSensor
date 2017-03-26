@@ -7,12 +7,16 @@ import os
 import glob
 import datetime
 from datetime import datetime
-
+import string
 
 
 def cleanText(x):
     return not (x.startswith("#")|x.startswith("@")|x.startswith("http:")| (x == '\n')| (x == '\r'))
 
+def tokenizing(x):
+    return x.lower().translate(str.maketrans('','',string.punctuation))
+    
+    
 def getUnixTimeStamp(stamp):
     d = datetime.strptime(stamp,'%a %b %d %H:%M:%S +0000 %Y')
     unixtime = time.mktime(d.timetuple())
@@ -26,7 +30,7 @@ def parseJson(jsonfile):
         for line in fin:
 
             if len(line) > 1000: # check if the line is proper tweet (by observation, all valid tweets have length at least 1000.)
-                d = json.loads(line.decode("UTF-8"))  # more effecient way would be check the line validity before loading
+                d = json.loads(line)  # more effecient way would be check the line validity before loading
 
                 #if len(d['entities']['hashtags']) and d['user']['lang'] == 'en': ## explicit booleaness to check is a list is empty
                 # remove last line to include empty hashtags and 
@@ -35,7 +39,9 @@ def parseJson(jsonfile):
                 #dow, month, day, time,_,year = d['created_at'].split(" ") 
                 ## Assign the extracted values into a new json to be stored.
                 ## UserName --> from_user
-                term_list = list(map(lambda x: x.encode('utf-8'), filter(cleanText, d['text'].split(" "))))
+                #term_list = list(map(lambda x: x.lower().strip(), filter(cleanText, d['text'].split(" "))))
+                
+                term_list = list(map(tokenizing, filter(cleanText, d['text'].split(" "))))
 
                 processed = {"from_user":d['user']['screen_name'],
                              ## Split hashtag, we only want the text in hashtag, discard indices.
@@ -44,7 +50,8 @@ def parseJson(jsonfile):
                              "term": term_list, 
                              ## append loc_ to each word in location
                              #"location":['loc_' + s for s in d['user']['location'].split(" ")],
-                             "location":['loc_' + s for s in d['user']['location'].split(" ")],
+                             #"location":['loc_' + s for s in d['user']['location'].split(" ")],
+                             "location":'loc_' + "_".join(map(tokenizing, d['user']['location'].split(" "))),
                              ## mention ids
                              "mention":[mention['screen_name'] for mention in d['entities']['user_mentions']],
                              ## language
